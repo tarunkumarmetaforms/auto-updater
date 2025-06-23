@@ -123,7 +123,7 @@ jobs:
           prerelease: ${{ steps.config.outputs.config != 'prod' }}
           args: >
             ${{ matrix.args }}
-            --config-path src-tauri/tauri.${{ steps.config.outputs.config }}.conf.json
+            --config src-tauri/tauri.${{ steps.config.outputs.config }}.conf.json
             --verbose
 
   # Create GitHub release summary (only for tagged releases)
@@ -164,8 +164,7 @@ jobs:
         run: cargo audit
         working-directory: ./src-tauri
 
-  # Test the application
-  test:
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

@@ -1,7 +1,41 @@
 {
-  "extends": "./tauri.conf.json",
+  "$schema": "https://schema.tauri.app/config/2",
   "productName": "AutoUpdater Dev",
+  "version": "0.1.0",
   "identifier": "com.yourcompany.auto-updater.dev",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Auto Updater Dev",
+        "width": 1000,
+        "height": 700,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "publisher": "Your Company",
+    "copyright": "Copyright © 2025 Your Company"
+  },
   "plugins": {
     "updater": {
       "active": true,
