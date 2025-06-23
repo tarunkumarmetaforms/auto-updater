@@ -34,7 +34,11 @@
       "icons/icon.ico"
     ],
     "publisher": "Your Company",
-    "copyright": "Copyright © 2025 Your Company"
+    "copyright": "Copyright © 2025 Your Company",
+    "macOS": {
+      "signingIdentity": null,
+      "entitlements": null
+    }
   },
   "plugins": {
     "updater": {
