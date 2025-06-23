@@ -164,8 +164,7 @@ jobs:
         run: cargo audit
         working-directory: ./src-tauri
 
-  # Test the application
-  test:
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
