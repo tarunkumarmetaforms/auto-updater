@@ -144,7 +144,7 @@ jobs:
           
           # The Tauri updater will automatically detect new releases via:
           # - Dev: https://api.github.com/repos/tarunkumarmetaforms/auto-updater/releases/latest
-          # - QA: https://api.github.com/repos/tarunkumarmetaforms/auto-updater/releases
+          # - QA:   https://api.github.com/repos/tarunkumarmetaforms/auto-updater/releases/latest
           # - Prod: https://api.github.com/repos/tarunkumarmetaforms/auto-updater/releases/latest
 
   # Security scan
@@ -164,37 +164,4 @@ jobs:
         run: cargo audit
         working-directory: ./src-tauri
 
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Rust setup
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Run frontend tests
-        run: pnpm test || echo "No tests configured"
-
-      - name: Run Rust tests
-        run: cargo test
-        working-directory: ./src-tauri
-
-      - name: Check formatting
-        run: |
-          cargo fmt --check
-          pnpm prettier --check . || echo "Prettier not configured"
-        working-directory: ./src-tauri 
+ 
