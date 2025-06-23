@@ -25,7 +25,7 @@ A production-ready Tauri application with comprehensive auto-updater functionali
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/tarunkumarmetaforms/auto-updater.git
    cd auto-updater
    ```
 
@@ -55,78 +55,72 @@ The application supports three environments with separate configurations:
 
 ### Development (`tauri.dev.conf.json`)
 - **Build**: `pnpm run tauri:build:dev`
-- **API**: `https://api-dev.yourcompany.com/updates/{{target}}/{{current_version}}`
+- **API**: `https://api.github.com/repos/tarunkumarmetaforms/auto-updater/releases/latest`
 - **Purpose**: Development and testing
 
 ### QA (`tauri.qa.conf.json`)
 - **Build**: `pnpm run tauri:build:qa`
-- **API**: `https://api-qa.yourcompany.com/updates/{{target}}/{{current_version}}`
-- **Purpose**: Quality assurance and staging
+- **API**: `https://api.github.com/repos/tarunkumarmetaforms/auto-updater/releases`
+- **Purpose**: Quality assurance and staging (includes pre-releases)
 
 ### Production (`tauri.prod.conf.json`)
 - **Build**: `pnpm run tauri:build:prod`
-- **API**: `https://api.yourcompany.com/updates/{{target}}/{{current_version}}`
-- **Purpose**: Production releases
+- **API**: `https://api.github.com/repos/tarunkumarmetaforms/auto-updater/releases/latest`
+- **Purpose**: Production releases (stable releases only)
 
-## Update Server Setup
+## Update System
 
-### Option 1: Use the Example Server
+### GitHub Releases Integration
 
-We provide a complete Node.js example server:
+This application uses **GitHub Releases** directly for updates - no custom server required! The Tauri updater automatically checks for new releases using the GitHub API.
 
-```bash
-# Install dependencies for the example server
-npm init -y
-npm install express cors
+#### How it Works
 
-# Run the example server
-node example-update-server.js
-```
+1. **GitHub Actions** builds and creates releases automatically
+2. **Tauri updater** checks the configured endpoint for new versions
+3. **Users** get notified and can install updates directly
 
-The server will run on `http://localhost:3001` and provide:
-- Update endpoint: `GET /updates/:target/:current_version`
-- Health check: `GET /health`
-- Release notifications: `POST /updates/notify`
+#### Update Endpoints
 
-### Option 2: Implement Your Own API
+- **Development**: Latest release (including pre-releases)
+- **QA**: All releases (for testing different versions)  
+- **Production**: Stable releases only
 
-Your update server should return JSON in this format:
+#### GitHub Release Format
 
-```json
-{
-  "version": "1.0.1",
-  "notes": "Bug fixes and performance improvements",
-  "pub_date": "2025-01-20T10:00:00Z",
-  "platforms": {
-    "darwin-aarch64": {
-      "signature": "base64-encoded-signature",
-      "url": "https://github.com/user/repo/releases/download/v1.0.1/app-1.0.1-aarch64.dmg"
-    }
-  }
-}
-```
+The Tauri updater expects GitHub releases to include:
+- **Version tag**: `v1.0.1` format
+- **Release assets**: Platform-specific installers (.dmg, .msi, .AppImage)
+- **Signatures**: Generated automatically by Tauri CLI
+- **Release notes**: Displayed to users during update
 
 ## GitHub Actions Setup
 
 ### Required Secrets
 
-Add these secrets to your GitHub repository:
+Add these secrets to your GitHub repository (Settings → Secrets and variables → Actions):
 
 1. **`TAURI_PRIVATE_KEY`**: Content of your `myapp.key` file
 2. **`TAURI_KEY_PASSWORD`**: Password for the private key (if set)
 
+To add secrets:
+1. Go to your repository on GitHub
+2. Click **Settings** → **Secrets and variables** → **Actions**  
+3. Click **New repository secret**
+4. Add the secret name and value
+
 ### Workflow Triggers
 
 The GitHub Actions workflow automatically:
-- **Builds** on pushes to `main`, `develop`, `qa` branches
+- **Builds** on pushes to `main2`, `development`, `qa` branches
 - **Releases** on tags starting with `v*`
-- **Notifies** your update server about new releases
+- **Creates GitHub releases** with signed binaries for auto-updates
 
 ### Branch Strategy
 
-- **`main`**: Production builds (`tauri.prod.conf.json`)
+- **`main2`**: Production builds (`tauri.prod.conf.json`)
 - **`qa`**: QA builds (`tauri.qa.conf.json`)
-- **`develop`**: Development builds (`tauri.dev.conf.json`)
+- **`development`**: Development builds (`tauri.dev.conf.json`)
 
 ## Building for Different Environments
 
@@ -220,8 +214,8 @@ RUST_LOG=tauri=debug pnpm run tauri:dev
 # Check Tauri info
 pnpm tauri info
 
-# Verify update server response
-curl -v "http://localhost:3001/updates/darwin-aarch64/0.1.0"
+# Verify GitHub releases API response
+curl -v "https://api.github.com/repos/tarunkumarmetaforms/auto-updater/releases/latest"
 ```
 
 ## Contributing
@@ -238,5 +232,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Documentation
 
-For detailed implementation steps, see [TAURI_UPDATER_SETUP_GUIDE.md](TAURI_UPDATER_SETUP_GUIDE.md).
+- **Setup Guide**: [TAURI_UPDATER_SETUP_GUIDE.md](TAURI_UPDATER_SETUP_GUIDE.md) - Detailed implementation steps
+- **Release Guide**: [RELEASE_GUIDE.md](RELEASE_GUIDE.md) - How to create releases and test updates
 # auto-updater

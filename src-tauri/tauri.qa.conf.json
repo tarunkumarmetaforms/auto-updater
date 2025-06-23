@@ -6,7 +6,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://api-qa.yourcompany.com/updates/{{target}}/{{current_version}}"
+        "https://api.github.com/repos/tarunkumarmetaforms/auto-updater/releases"
       ],
       "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlFOEU2OTVFNjJDQjQwMDIKUldRQ1FNdGlYbW1PbnZkclk2ckNteVJyVE5zaTlKS0grOHRJUUdYOGcxTnczMWFYaExYUzQraXEK"
