@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
-use tauri::Manager;
 use tauri::Emitter;
+use tauri::Manager;
 use tauri_plugin_updater::UpdaterExt;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -34,11 +34,11 @@ async fn check_for_updates(app: tauri::AppHandle) -> Result<UpdateInfo, String> 
                     Some(d) => d.to_string(),
                     None => "Unknown".to_string(),
                 };
-                
+
                 // Store the update for later installation
                 let pending_update = app.state::<PendingUpdate>();
                 *pending_update.0.lock().unwrap() = Some(update);
-                
+
                 Ok(UpdateInfo {
                     version,
                     notes,
@@ -55,7 +55,7 @@ async fn check_for_updates(app: tauri::AppHandle) -> Result<UpdateInfo, String> 
             Err(e) => Err(format!("Failed to check for updates: {}", e)),
         }
     }
-    
+
     #[cfg(not(desktop))]
     {
         Err("Updates not supported on this platform".to_string())
@@ -71,10 +71,10 @@ async fn download_and_install_update(
     {
         let pending_update = app.state::<PendingUpdate>();
         let update = pending_update.0.lock().unwrap().take();
-        
+
         if let Some(update) = update {
             let window_clone = window.clone();
-            
+
             update
                 .download_and_install(
                     |chunk_length, content_length| {
@@ -91,13 +91,13 @@ async fn download_and_install_update(
                 )
                 .await
                 .map_err(|e| format!("Failed to download and install update: {}", e))?;
-            
+
             Ok(())
         } else {
             Err("No pending update found".to_string())
         }
     }
-    
+
     #[cfg(not(desktop))]
     {
         Err("Updates not supported on this platform".to_string())
@@ -113,7 +113,7 @@ fn get_app_version() -> String {
 fn get_app_environment() -> String {
     #[cfg(debug_assertions)]
     return "development".to_string();
-    
+
     #[cfg(not(debug_assertions))]
     {
         // You can determine environment based on build configuration
@@ -131,6 +131,7 @@ fn greet(name: &str) -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
