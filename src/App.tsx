@@ -94,7 +94,7 @@ function App() {
       <header className="header">
         <h1>Auto Updater</h1>
         <div className="app-info">
-          <p>Version: {appVersion}</p>
+          <p>Version: {appVersion} dadasd asd asd as as asd asd asd asd </p>
           <p>Environment: {environment}</p>
         </div>
       </header>
