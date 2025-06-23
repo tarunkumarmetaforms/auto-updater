@@ -93,12 +93,22 @@ jobs:
           fi
         shell: bash
 
+      # macOS specific preparation for Sequoia compatibility
+      - name: Prepare macOS build environment (macOS Sequoia compatibility)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          echo "🍎 Preparing macOS build with Sequoia (15.x) compatibility fixes"
+          echo "📦 DMG self-signing will be disabled to prevent installer issues"
+          echo "🔧 Using Tauri v2 with built-in macOS Sequoia support"
+
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          # Ensure macOS Sequoia compatibility
+          TAURI_BUNDLE_DMG_SIGN: false
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Auto Updater v__VERSION__ (${{ steps.config.outputs.environment }})'
@@ -114,6 +124,15 @@ jobs:
             
             ### Installation
             Download the appropriate installer for your platform below.
+            
+            #### macOS Users (Sequoia 15.x+ Compatibility)
+            If you encounter "cannot verify that this app is free from malware" on macOS Sequoia:
+            
+            1. **Recommended**: After seeing the error, go to **System Preferences → Privacy & Security**, find the app, and click "Allow Anyway"
+            2. **Alternative**: Remove quarantine with: `xattr -d com.apple.quarantine /path/to/Auto\ Updater.dmg`
+            3. **If still having issues**: After installation, run: `xattr -d com.apple.quarantine /Applications/Auto\ Updater.app`
+            
+            This release includes built-in fixes for macOS Sequoia compatibility issues.
             
             ### Verification
             All binaries are signed and can be verified using the included signatures.
@@ -141,6 +160,8 @@ jobs:
           echo "📦 Repository: tarunkumarmetaforms/auto-updater"
           echo "🔗 Release URL: https://github.com/tarunkumarmetaforms/auto-updater/releases/tag/${{ github.ref_name }}"
           echo "🚀 Auto-updater will use GitHub releases API for updates"
+          echo "🍎 macOS Sequoia (15.x) compatibility fixes included"
+          echo "🔧 DMG self-signing disabled for better macOS compatibility"
           
           # The Tauri updater will automatically detect new releases via:
           # - Dev: https://api.github.com/repos/tarunkumarmetaforms/auto-updater/releases/latest

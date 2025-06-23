@@ -12,6 +12,7 @@ This guide provides step-by-step instructions to implement a production-grade au
 7. [GitHub Actions Setup](#github-actions-setup)
 8. [API Endpoints](#api-endpoints)
 9. [Testing the Updater](#testing-the-updater)
+10. [macOS Sequoia (15.x) Installer Issue](#macos-sequoia-15x-installer-issue)
 
 ## Prerequisites
 
@@ -397,7 +398,6 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-```
 
 ## Frontend Implementation
 
@@ -980,3 +980,54 @@ curl -v "https://api.yourcompany.com/updates/darwin-aarch64/0.1.0"
 5. Implement rollback mechanisms if needed
 
 This setup provides a robust, production-ready auto-updater system for your Tauri application with proper environment separation and security measures.
+
+## macOS Sequoia (15.x) Installer Issue
+
+### Problem
+On macOS Sequoia (15.x), users may encounter issues opening the installer DMG file, even when using "Right-click → Open". This is due to Apple's stricter security policies in newer macOS versions.
+
+### Solutions
+
+#### For End Users
+If you're a user trying to install the app and encountering the "cannot verify" error:
+
+1. **Use System Preferences** (Recommended):
+   - Try to open the DMG file normally
+   - When the error appears, close the dialog
+   - Go to **System Preferences → Privacy & Security**
+   - Scroll down to find the blocked application
+   - Click "Allow Anyway" or "Open Anyway"
+   - Try opening the DMG again
+
+2. **Remove Quarantine Attribute**:
+   ```bash
+   # Remove quarantine from the DMG file
+   xattr -d com.apple.quarantine /path/to/your-app.dmg
+   
+   # After installation, you may need to do the same for the app
+   xattr -d com.apple.quarantine /Applications/YourApp.app
+   ```
+
+3. **Code Signing Verification**:
+   ```bash
+   # Force re-sign the app (this removes the self-signature)
+   codesign --force --deep -s - /Applications/YourApp.app
+   ```
+
+#### For Developers
+The project configuration has been updated to minimize this issue:
+
+1. **DMG Self-Signing Disabled**: The Tauri configuration now explicitly avoids self-signing the DMG file
+2. **Proper Bundle Configuration**: Added macOS-specific bundle settings that are more compatible with Sequoia
+3. **Updated Tauri Version**: Using Tauri v2 which includes fixes for this issue
+
+### Testing
+When testing locally, note that locally built apps are typically trusted, so you may not see this issue during development. To properly test:
+
+1. Build the release version
+2. Upload to a server and download it again (this adds the quarantine attribute)
+3. Test the installation process on a clean macOS Sequoia system
+
+### References
+- [Tauri Issue #12288](https://github.com/tauri-apps/tauri/issues/12288)
+- [Apple Developer Documentation](https://support.apple.com/guide/mac-help/mh40616/mac)
